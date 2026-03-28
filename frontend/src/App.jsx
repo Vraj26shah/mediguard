@@ -1,47 +1,28 @@
 /**
- * App.jsx — Root layout for MediGuard dashboard
- *
- * Split into 3 columns:
- *   LEFT   → ServiceCards (infra map — shows live status of 3 services)
- *   CENTER → ChatPanel   (NL command input + role selector)
- *   RIGHT  → AuditLog    (ALLOW / BLOCK history from ArmorClaw)
- *
- * The `blockFlash` state is lifted here so ANY blocked action can
- * flash the entire screen red regardless of which component triggers it.
+ * App.jsx — MediGuard: Enterprise AI-Powered SRE Platform
+ * Production-ready dashboard with ArmorClaw policy enforcement
  */
 
 import React, { useState } from 'react';
-import ServiceCard from './components/ServiceCard';
-import ChatPanel from './components/ChatPanel';
-import AuditLog from './components/AuditLog';
+import Dashboard from './components/Dashboard';
+import IDEView from './components/IDEView';
 import useSystemState from './hooks/useSystemState';
 import useOpenClaw from './hooks/useOpenClaw';
 
 export default function App() {
-  // Current active role — passed to OpenClaw as metadata on every message
-  // Roles: 'junior_dev' | 'senior_dev' | 'project_manager'
+  const [activeTab, setActiveTab] = useState('dashboard');
   const [role, setRole] = useState('junior_dev');
-
-  // Whether to show the red screen flash (fires on BLOCK events from ArmorClaw)
   const [isFlashing, setIsFlashing] = useState(false);
-
-  // Audit log entries — each entry: { id, timestamp, role, command, decision, reason }
   const [auditEntries, setAuditEntries] = useState([]);
 
-  // Polls GET /api/status every 2 seconds, returns { auth_api, patient_db, billing_api }
   const { services, isLoading } = useSystemState();
 
-  // WebSocket connection to OpenClaw gateway (ws://127.0.0.1:18789)
-  // onBlock: ArmorClaw blocked a tool call
-  // onAllow: ArmorClaw allowed a tool call
   const { sendCommand, isConnected } = useOpenClaw({
     role,
     onBlock: ({ command, reason }) => {
-      // Flash the screen red
       setIsFlashing(true);
       setTimeout(() => setIsFlashing(false), 800);
 
-      // Add BLOCK entry to audit log
       setAuditEntries((prev) => [
         {
           id: Date.now(),
@@ -50,12 +31,12 @@ export default function App() {
           command,
           decision: 'BLOCK',
           reason,
+          status: 'blocked',
         },
         ...prev,
       ]);
     },
     onAllow: ({ command, tool }) => {
-      // Add ALLOW entry to audit log
       setAuditEntries((prev) => [
         {
           id: Date.now(),
@@ -64,6 +45,7 @@ export default function App() {
           command,
           decision: 'ALLOW',
           reason: `Tool '${tool}' executed`,
+          status: 'allowed',
         },
         ...prev,
       ]);
@@ -71,46 +53,104 @@ export default function App() {
   });
 
   return (
-    // Outer wrapper — applies red flash animation class when a BLOCK fires
-    <div className={`min-h-screen p-4 ${isFlashing ? 'animate-block-flash' : ''}`}>
-      {/* Header */}
-      <header className="mb-6 flex items-center justify-between border-b border-gray-800 pb-4">
-        <div>
-          <h1 className="text-2xl font-bold text-blue-400">MediGuard</h1>
-          <p className="text-sm text-gray-500">Autonomous DevOps with Intent Assurance</p>
+    <div className={`h-screen bg-gray-950 flex flex-col ${isFlashing ? 'animate-block-flash' : ''}`}>
+      {/* SINGLE GLOBAL HEADER */}
+      <header className="h-20 bg-gradient-to-r from-gray-900 via-gray-900 to-gray-850 border-b border-gray-800 flex items-center justify-between px-8">
+        {/* LEFT: Logo & Branding */}
+        <div className="flex items-center gap-5">
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-blue-700 rounded-xl flex items-center justify-center shadow-2xl shadow-blue-600/40 border border-blue-500/30">
+              <span className="text-white font-black text-xl">M</span>
+            </div>
+            <div className="flex flex-col gap-1">
+              <h1 className="text-lg font-black text-white tracking-tight">MediGuard</h1>
+              <p className="text-xs text-blue-400 font-semibold">Enterprise DevOps Platform</p>
+            </div>
+          </div>
+
+          <div className="h-10 w-px bg-gradient-to-b from-gray-800 to-transparent" />
+
+          {/* CENTER: Tab Switcher */}
+          <nav className="flex gap-2">
+            <button
+              onClick={() => setActiveTab('dashboard')}
+              className={`px-6 py-2 text-sm font-bold transition-all rounded-lg ${
+                activeTab === 'dashboard'
+                  ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/40 border border-blue-500/50'
+                  : 'text-gray-400 hover:text-gray-200 hover:bg-gray-800/50 border border-gray-800'
+              }`}
+            >
+              Dashboard
+            </button>
+            <button
+              onClick={() => setActiveTab('ide')}
+              className={`px-6 py-2 text-sm font-bold transition-all rounded-lg ${
+                activeTab === 'ide'
+                  ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/40 border border-blue-500/50'
+                  : 'text-gray-400 hover:text-gray-200 hover:bg-gray-800/50 border border-gray-800'
+              }`}
+            >
+              Code Editor
+            </button>
+          </nav>
         </div>
-        <div className="flex items-center gap-2">
-          <span className={`h-2 w-2 rounded-full ${isConnected ? 'bg-green-400' : 'bg-red-500'}`} />
-          <span className="text-xs text-gray-400">
-            {isConnected ? 'OpenClaw connected' : 'OpenClaw disconnected'}
-          </span>
+
+        {/* RIGHT: Status & Controls */}
+        <div className="flex items-center gap-6">
+          {/* Role Selector */}
+          <div className="flex flex-col gap-1.5">
+            <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Current Role</label>
+            <select
+              value={role}
+              onChange={(e) => setRole(e.target.value)}
+              className="text-sm font-semibold bg-gray-800 text-gray-100 border border-gray-700 rounded-lg px-4 py-2 hover:border-blue-500 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 cursor-pointer transition-all"
+            >
+              <option value="junior_dev">Junior Developer</option>
+              <option value="senior_dev">Senior Developer</option>
+              <option value="project_manager">Project Manager</option>
+            </select>
+          </div>
+
+          <div className="h-10 w-px bg-gradient-to-b from-gray-800 to-transparent" />
+
+          {/* Connection Status */}
+          <div className="flex items-center gap-3">
+            <div className="flex flex-col gap-1.5 text-right">
+              <p className="text-xs font-bold text-gray-500 uppercase tracking-wider">System Status</p>
+              <div className="flex items-center gap-2 bg-gray-800/50 rounded-lg px-3 py-1.5 border border-gray-700">
+                <span
+                  className={`w-3 h-3 rounded-full ${
+                    isConnected ? 'bg-green-500 shadow-lg shadow-green-500/50 animate-pulse' : 'bg-red-500'
+                  }`}
+                />
+                <span className="text-xs font-mono text-gray-300 font-semibold">
+                  {isConnected ? 'Live' : 'Offline'}
+                </span>
+              </div>
+            </div>
+          </div>
         </div>
       </header>
 
-      {/* 3-column main layout */}
-      <main className="grid grid-cols-[280px_1fr_320px] gap-4 h-[calc(100vh-120px)]">
-        {/* LEFT — Infrastructure Map */}
-        <section className="flex flex-col gap-3">
-          <h2 className="text-xs uppercase tracking-widest text-gray-500">Infrastructure</h2>
-          {isLoading ? (
-            <p className="text-sm text-gray-600">Loading services…</p>
-          ) : (
-            Object.entries(services).map(([key, service]) => (
-              <ServiceCard key={key} serviceKey={key} service={service} />
-            ))
-          )}
-        </section>
-
-        {/* CENTER — Chat + Role Selector */}
-        <section>
-          <ChatPanel role={role} onRoleChange={setRole} onSend={sendCommand} />
-        </section>
-
-        {/* RIGHT — Audit Log */}
-        <section className="flex flex-col gap-3 overflow-hidden">
-          <h2 className="text-xs uppercase tracking-widest text-gray-500">Audit Log</h2>
-          <AuditLog entries={auditEntries} />
-        </section>
+      {/* MAIN CONTENT */}
+      <main className="flex-1 overflow-hidden">
+        {activeTab === 'dashboard' ? (
+          <Dashboard
+            role={role}
+            services={services}
+            isLoading={isLoading}
+            auditEntries={auditEntries}
+            sendCommand={sendCommand}
+            isConnected={isConnected}
+          />
+        ) : (
+          <IDEView
+            role={role}
+            onRoleChange={setRole}
+            sendCommand={sendCommand}
+            isConnected={isConnected}
+          />
+        )}
       </main>
     </div>
   );
