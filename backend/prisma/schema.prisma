@@ -1,0 +1,52 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model ServiceGateway {
+  id         Int     @id @default(autoincrement())
+  serviceKey String  @unique
+  name       String
+  port       Int
+  status     String
+  uptime     String
+}
+
+model AuthMetrics {
+  id             Int    @id @default(autoincrement())
+  sessionsActive Int
+  status         String
+}
+
+model PatientMetrics {
+  id               Int     @id @default(autoincrement())
+  admittedPatients Int
+  maintenanceMode  Boolean
+  status           String
+}
+
+model DoctorSchedule {
+  id         Int     @id @default(autoincrement())
+  doctorName String
+  shift      String
+  isOnCall   Boolean
+}
+
+model MedicalRecordsPHI {
+  id           Int    @id @default(autoincrement())
+  storageUsed  String
+  storageTotal String
+  totalRecords Int
+  status       String
+}
+
+model BillingMetrics {
+  id            Int    @id @default(autoincrement())
+  pendingClaims Int
+  cronStatus    String
+  status        String
+}
