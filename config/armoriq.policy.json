@@ -1,0 +1,75 @@
+{
+  "_comment": "ArmorClaw policy file — defines which roles can call which tools. Evaluated deterministically BEFORE any tool executes. The LLM never sees this file.",
+
+  "version": "1.0",
+  "defaultAction": "BLOCK",
+
+  "rules": [
+    {
+      "id": "junior-dev-restart-allow",
+      "description": "Junior devs can restart services — safe, reversible operation",
+      "condition": {
+        "role": "junior_dev",
+        "tool": "restart_service"
+      },
+      "action": "ALLOW"
+    },
+    {
+      "id": "junior-dev-drop-block",
+      "description": "Junior devs CANNOT drop databases — they must not touch PHI data",
+      "condition": {
+        "role": "junior_dev",
+        "tool": "drop_*"
+      },
+      "action": "BLOCK",
+      "reason": "Junior developers do not have permission to drop databases. PHI data access requires Project Manager approval."
+    },
+    {
+      "id": "senior-dev-restart-allow",
+      "description": "Senior devs can restart services",
+      "condition": {
+        "role": "senior_dev",
+        "tool": "restart_service"
+      },
+      "action": "ALLOW"
+    },
+    {
+      "id": "senior-dev-drop-block",
+      "description": "Senior devs CANNOT drop databases — PHI changes require PM sign-off",
+      "condition": {
+        "role": "senior_dev",
+        "tool": "drop_*"
+      },
+      "action": "BLOCK",
+      "reason": "PHI data operations require Project Manager approval, even for Senior Developers."
+    },
+    {
+      "id": "pm-drop-allow",
+      "description": "Project Managers are authorized to drop databases",
+      "condition": {
+        "role": "project_manager",
+        "tool": "drop_*"
+      },
+      "action": "ALLOW"
+    },
+    {
+      "id": "pm-restart-allow",
+      "description": "Project Managers can restart services",
+      "condition": {
+        "role": "project_manager",
+        "tool": "restart_service"
+      },
+      "action": "ALLOW"
+    },
+    {
+      "id": "block-admin-delete-always",
+      "description": "No role — including PM — can delete admin accounts. Hard block.",
+      "condition": {
+        "role": "*",
+        "tool": "delete_admin_*"
+      },
+      "action": "BLOCK",
+      "reason": "Admin account deletion is never permitted via the AI agent. Use the admin console directly."
+    }
+  ]
+}
