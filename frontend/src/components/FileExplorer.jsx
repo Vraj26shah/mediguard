@@ -1,3 +1,18 @@
+/**
+ * ═══════════════════════════════════════════════════════════════════════
+ * FILEEXPLORER.JSX — Mock File System Tree
+ * ═══════════════════════════════════════════════════════════════════════
+ *
+ * Left sidebar component showing hierarchical file/folder tree:
+ *   • Expandable/collapsible folders (state: openFolders Set)
+ *   • File icons colored by type: [js], [sq], [ym], [sh], [{}], [ev]
+ *   • Click file → onFileSelect callback
+ *   • Click folder → toggle expansion
+ *   • Selected file highlighted in blue
+ *
+ * Data: Hardcoded mock healthcare project structure (no real I/O)
+ */
+
 import { useState } from 'react';
 
 const FILE_TREE = [

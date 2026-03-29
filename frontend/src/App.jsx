@@ -1,6 +1,17 @@
 /**
- * App.jsx — MediGuard: Enterprise AI-Powered SRE Platform
- * Production-ready dashboard with ArmorClaw policy enforcement
+ * ═══════════════════════════════════════════════════════════════════════
+ * APP.JSX — MediGuard Main Application Shell
+ * ═══════════════════════════════════════════════════════════════════════
+ *
+ * Root application component managing:
+ *   • Global state (role, audit entries, flash animation)
+ *   • Tab switching (Dashboard ↔ IDE View)
+ *   • WebSocket connection to OpenClaw AI gateway
+ *   • Policy enforcement feedback (ALLOW/BLOCK events)
+ *
+ * Architecture:
+ *   App → Dashboard OR IDEView (based on activeTab)
+ *   Both views share: role state, sendCommand, isConnected
  */
 
 import React, { useState } from 'react';

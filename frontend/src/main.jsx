@@ -1,3 +1,10 @@
+/**
+ * ═══════════════════════════════════════════════════════════════════════
+ * MAIN.JSX — React Entry Point
+ * ═══════════════════════════════════════════════════════════════════════
+ * Mounts App component to DOM root element.
+ */
+
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';

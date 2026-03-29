@@ -1,3 +1,17 @@
+/**
+ * ═══════════════════════════════════════════════════════════════════════
+ * DASHBOARD.JSX — Healthcare Infrastructure Monitor
+ * ═══════════════════════════════════════════════════════════════════════
+ *
+ * Main dashboard view showing:
+ *   • Infrastructure health metrics (4-stat overview)
+ *   • Service status cards with uptime indicators
+ *   • Role-based access control matrix
+ *   • AI command interface (natural language → OpenClaw)
+ *   • ArmorClaw policy enforcement info
+ *   • Audit trail of ALLOW/BLOCK decisions
+ */
+
 import { useState, useEffect } from 'react';
 
 const ROLE_PERMISSIONS = {

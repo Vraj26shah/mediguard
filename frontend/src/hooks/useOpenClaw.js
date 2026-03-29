@@ -1,29 +1,31 @@
 /**
- * useOpenClaw.js
+ * ═══════════════════════════════════════════════════════════════════════
+ * USEopenclaw.JS — WebSocket Gateway to AI Agent
+ * ═══════════════════════════════════════════════════════════════════════
  *
- * Manages the WebSocket connection to the OpenClaw gateway.
- * OpenClaw listens on ws://127.0.0.1:18789 (default port after install).
+ * Custom React hook managing WebSocket connection to OpenClaw gateway.
+ * OpenClaw endpoint: ws://127.0.0.1:18789 (auto-reconnects if dropped)
  *
- * Message format sent TO OpenClaw:
+ * OUTBOUND MESSAGE FORMAT (to OpenClaw):
  *   {
  *     type: 'message',
- *     role: 'junior_dev',           ← used by ArmorClaw for policy checks
- *     content: 'Drop the patient database'
+ *     role: 'junior_dev' | 'senior_dev' | 'project_manager',
+ *     content: 'Drop the patient database'  ← user command
  *   }
  *
- * Messages received FROM OpenClaw:
- *   { type: 'armorclaw_block', tool, reason }  ← ArmorClaw blocked the tool call
- *   { type: 'armorclaw_allow', tool }           ← ArmorClaw allowed the tool call
- *   { type: 'message', content }                ← AI text response
+ * INBOUND MESSAGE FORMATS (from OpenClaw):
+ *   { type: 'armorclaw_block', tool, reason }  ← Policy rejected (→ onBlock callback)
+ *   { type: 'armorclaw_allow', tool }          ← Policy approved (→ onAllow callback)
+ *   { type: 'message', content }               ← AI response text
  *
- * Props (options object):
- *   role      (string) — current role, re-attached to every outgoing message
- *   onBlock   (fn)     — called with { command, reason } when ArmorClaw blocks
- *   onAllow   (fn)     — called with { command, tool }   when ArmorClaw allows
+ * HOOK OPTIONS:
+ *   role   (string) — Current user role (attached to every outgoing message)
+ *   onBlock (fn)    — Callback: { command, reason } when ArmorClaw blocks
+ *   onAllow (fn)    — Callback: { command, tool } when ArmorClaw allows
  *
- * Returns:
- *   sendCommand   (fn)   — call with a command string to send to OpenClaw
- *   isConnected   (bool) — WebSocket readyState === OPEN
+ * RETURNS:
+ *   sendCommand(cmd)  → Send string to OpenClaw
+ *   isConnected       → Boolean: WebSocket.OPEN?
  */
 
 import { useState, useEffect, useRef, useCallback } from 'react';

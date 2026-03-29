@@ -1,3 +1,16 @@
+/**
+ * ═══════════════════════════════════════════════════════════════════════
+ * CODEEDITOR.JSX — Monaco Editor Wrapper
+ * ═══════════════════════════════════════════════════════════════════════
+ *
+ * React wrapper around Monaco Editor (@monaco-editor/react)
+ * Features:
+ *   • Custom dark theme matching MediGuard design
+ *   • Auto language detection from file extension
+ *   • Configurable editor options (line numbers, minimap, etc.)
+ *   • File name display in header tab
+ */
+
 import Editor from '@monaco-editor/react';
 
 const EDITOR_OPTIONS = {

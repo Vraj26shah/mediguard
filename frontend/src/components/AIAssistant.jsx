@@ -1,3 +1,16 @@
+/**
+ * ═══════════════════════════════════════════════════════════════════════
+ * AIASSISTANT.JSX — Code-Context-Aware AI Chat
+ * ═══════════════════════════════════════════════════════════════════════
+ *
+ * Right sidebar AI chat component in IDE view:
+ *   • Terminal-style messages (> user input, system responses)
+ *   • Quick-action chips for common requests
+ *   • Commands prepended with active file name for context
+ *   • Auto-scroll to latest message
+ *   • OpenClaw connection status in input placeholder
+ */
+
 import { useState, useRef, useEffect } from 'react';
 
 const QUICK_ACTIONS = [
