@@ -690,10 +690,13 @@ export default function FileExplorer({ onFileSelect, selectedFile }) {
         >
           {item.type === 'folder' ? (
             <>
-              <span className="text-gray-600 text-xs w-3">
-                {openFolders.has(item.path) ? 'v' : '>'}
-              </span>
-              <span className="text-gray-500">{item.name}</span>
+              <svg
+                className={`w-3 h-3 text-gray-500 transition-transform duration-200 ${openFolders.has(item.path) ? 'rotate-90' : ''}`}
+                fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+              </svg>
+              <span className="text-gray-400">{item.name}</span>
             </>
           ) : (
             <>
