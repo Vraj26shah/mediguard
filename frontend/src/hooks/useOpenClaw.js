@@ -37,7 +37,7 @@ export default function useOpenClaw({ role, onBlock, onAllow }) {
   const [isConnected, setIsConnected] = useState(false);
   const wsRef = useRef(null);
 
-  // Keep latest role in a ref so the sendCommand closure always reads the current value
+  // Keep role in a ref so the sendCommand closure always reads the current value
   const roleRef = useRef(role);
   useEffect(() => { roleRef.current = role; }, [role]);
 
