@@ -2,7 +2,7 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 
 /**
- * Vite config for MediGuard frontend.
+ * Vite config for Devsec frontend.
  *
  * Proxy rules:
  *   /api  →  http://localhost:4000  (Express backend)

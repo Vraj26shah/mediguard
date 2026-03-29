@@ -5,7 +5,7 @@
  *
  * React wrapper around Monaco Editor (@monaco-editor/react)
  * Features:
- *   • Custom dark theme matching MediGuard design
+ *   • Custom dark theme matching Devsec design
  *   • Auto language detection from file extension
  *   • Configurable editor options (line numbers, minimap, etc.)
  *   • File name display in header tab
@@ -14,7 +14,7 @@
 import Editor from '@monaco-editor/react';
 
 const EDITOR_OPTIONS = {
-  theme: 'mediguard-dark',
+  theme: 'Devsec-dark',
   fontSize: 13,
   fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
   lineNumbers: 'on',
@@ -57,7 +57,7 @@ function getLanguage(fileName) {
 
 export default function CodeEditor({ value, onChange, language, fileName = 'file.js' }) {
   function handleBeforeMount(monaco) {
-    monaco.editor.defineTheme('mediguard-dark', {
+    monaco.editor.defineTheme('Devsec-dark', {
       base: 'vs-dark',
       inherit: true,
       rules: [
@@ -92,7 +92,7 @@ export default function CodeEditor({ value, onChange, language, fileName = 'file
           onChange={onChange}
           options={EDITOR_OPTIONS}
           beforeMount={handleBeforeMount}
-          theme="mediguard-dark"
+          theme="Devsec-dark"
           loading={
             <div className="flex items-center justify-center h-full text-gray-600 text-xs font-mono">
               Loading editor...

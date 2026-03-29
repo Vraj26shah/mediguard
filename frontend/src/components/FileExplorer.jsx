@@ -17,7 +17,7 @@ import { useState } from 'react';
 
 const FILE_TREE = [
   {
-    name: 'mediguard-backend',
+    name: 'Devsec-backend',
     path: '',
     type: 'folder',
     children: [
@@ -149,7 +149,7 @@ module.exports = router;`,
                     name: '001_init.sql',
                     path: 'src/db/migrations/001_init.sql',
                     language: 'sql',
-                    content: `-- Initial schema for MediGuard database
+                    content: `-- Initial schema for Devsec database
 -- Created: 2024-01-15
 -- PHI fields are encrypted at rest
 
@@ -355,7 +355,7 @@ app.use((err, req, res, next) => {
 });
 
 app.listen(config.port, () => {
-  console.log(\`MediGuard server running on port \${config.port}\`);
+  console.log(\`Devsec server running on port \${config.port}\`);
 });`,
           },
         ],
@@ -380,7 +380,7 @@ services:
       NODE_ENV: production
       DB_HOST: postgres
       DB_PORT: 5432
-      DB_NAME: mediguard
+      DB_NAME: Devsec
       DB_USER: \${DB_USER}
       DB_PASSWORD: \${DB_PASSWORD}
       JWT_SECRET: \${JWT_SECRET}
@@ -389,12 +389,12 @@ services:
       postgres:
         condition: service_healthy
     networks:
-      - mediguard
+      - Devsec
 
   postgres:
     image: postgres:15-alpine
     environment:
-      POSTGRES_DB: mediguard
+      POSTGRES_DB: Devsec
       POSTGRES_USER: \${DB_USER}
       POSTGRES_PASSWORD: \${DB_PASSWORD}
     volumes:
@@ -407,13 +407,13 @@ services:
       timeout: 5s
       retries: 5
     networks:
-      - mediguard
+      - Devsec
 
 volumes:
   postgres_data:
 
 networks:
-  mediguard:`,
+  Devsec:`,
           },
           {
             name: 'Dockerfile',
@@ -439,7 +439,7 @@ CMD ["node", "src/server.js"]`,
             name: 'nginx.conf',
             path: 'infra/nginx.conf',
             language: 'plaintext',
-            content: `upstream mediguard_api {
+            content: `upstream Devsec_api {
   server api:4000;
 }
 
@@ -450,7 +450,7 @@ server {
   client_max_body_size 10M;
 
   location / {
-    proxy_pass http://mediguard_api;
+    proxy_pass http://Devsec_api;
     proxy_set_header Host $host;
     proxy_set_header X-Real-IP $remote_addr;
     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -459,7 +459,7 @@ server {
 
   location /health {
     access_log off;
-    proxy_pass http://mediguard_api;
+    proxy_pass http://Devsec_api;
   }
 }`,
           },
@@ -526,14 +526,14 @@ seed().catch(console.error);`,
             language: 'shell',
             content: `#!/bin/bash
 
-# MediGuard Database Backup Script
+# Devsec Database Backup Script
 # Usage: ./backup.sh
 
 set -e
 
 BACKUP_DIR="./backups"
 TIMESTAMP=$(date +%Y%m%d_%H%M%S)
-BACKUP_FILE="$BACKUP_DIR/mediguard_backup_$TIMESTAMP.sql"
+BACKUP_FILE="$BACKUP_DIR/Devsec_backup_$TIMESTAMP.sql"
 
 mkdir -p "$BACKUP_DIR"
 
@@ -549,7 +549,7 @@ pg_dump \\
 echo "Backup completed: $BACKUP_FILE"
 
 # Keep only last 7 backups
-find "$BACKUP_DIR" -name "mediguard_backup_*.sql" -mtime +7 -delete
+find "$BACKUP_DIR" -name "Devsec_backup_*.sql" -mtime +7 -delete
 
 echo "Cleanup complete"`,
           },
@@ -599,8 +599,8 @@ PORT=4000
 
 DB_HOST=localhost
 DB_PORT=5432
-DB_NAME=mediguard
-DB_USER=mediguard
+DB_NAME=Devsec
+DB_USER=Devsec
 DB_PASSWORD=your_secure_password_here
 
 JWT_SECRET=your_jwt_secret_key_here_change_in_production
@@ -613,7 +613,7 @@ ENCRYPT_KEY_ID=key_v1`,
         path: 'package.json',
         language: 'json',
         content: `{
-  "name": "mediguard-backend",
+  "name": "Devsec-backend",
   "version": "1.0.0",
   "description": "AI-powered SRE assistant for healthcare platform",
   "main": "src/server.js",

@@ -1,6 +1,6 @@
 /**
  * ═══════════════════════════════════════════════════════════════════════
- * APP.JSX — MediGuard Main Application Shell
+ * APP.JSX — Devsec Main Application Shell
  * ═══════════════════════════════════════════════════════════════════════
  *
  * Root application component managing:
@@ -74,7 +74,7 @@ export default function App() {
               <span className="text-white font-black text-xl">M</span>
             </div>
             <div className="flex flex-col gap-1">
-              <h1 className="text-lg font-black text-white tracking-tight">MediGuard</h1>
+              <h1 className="text-lg font-black text-white tracking-tight">Devsec</h1>
               <p className="text-xs text-blue-400 font-semibold">Enterprise DevOps Platform</p>
             </div>
           </div>
