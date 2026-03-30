@@ -1,3 +1,22 @@
+<<<<<<< HEAD
+=======
+/**
+ * ═══════════════════════════════════════════════════════════════════════
+ * APP.JSX — Devsec Main Application Shell
+ * ═══════════════════════════════════════════════════════════════════════
+ *
+ * Root application component managing:
+ *   • Global state (role, audit entries, flash animation)
+ *   • Tab switching (Dashboard ↔ IDE View)
+ *   • WebSocket connection to OpenClaw AI gateway
+ *   • Policy enforcement feedback (ALLOW/BLOCK events)
+ *
+ * Architecture:
+ *   App → Dashboard OR IDEView (based on activeTab)
+ *   Both views share: role state, sendCommand, isConnected
+ */
+
+>>>>>>> b36a71ba706e72497f688977845d27cc5de0e5ad
 import React, { useState } from 'react';
 import Dashboard from './components/Dashboard';
 import IDEView from './components/IDEView';
@@ -58,7 +77,7 @@ export default function App() {
               <span className="text-white font-black text-xl">M</span>
             </div>
             <div className="flex flex-col gap-1">
-              <h1 className="text-lg font-black text-white tracking-tight">MediGuard</h1>
+              <h1 className="text-lg font-black text-white tracking-tight">Devsec</h1>
               <p className="text-xs text-blue-400 font-semibold">Enterprise DevOps Platform</p>
             </div>
           </div>

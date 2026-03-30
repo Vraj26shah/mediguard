@@ -1,3 +1,21 @@
+/**
+ * ═══════════════════════════════════════════════════════════════════════
+ * IDEVIEW.JSX — Code Editor IDE Interface
+ * ═══════════════════════════════════════════════════════════════════════
+ *
+ * Premium code editor view with 3-pane layout:
+ *   LEFT   → FileExplorer (mock file tree navigation)
+ *   CENTER → CodeEditor (Monaco editor with syntax highlighting)
+ *   RIGHT  → AIAssistant (context-aware AI chat for code)
+ *
+ * Features:
+ *   • File selection syncs across all panes
+ *   • Quick actions for code review (review/explain/security/improve)
+ *   • New file/folder dialog
+ *   • Syntax highlighting per file type
+ *   • Live OpenClaw connection status
+ */
+
 import { useState } from 'react';
 import FileExplorer from './FileExplorer';
 import CodeEditor from './CodeEditor';

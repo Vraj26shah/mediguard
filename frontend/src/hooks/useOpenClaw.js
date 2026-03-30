@@ -1,17 +1,24 @@
 /**
- * useOpenClaw.js
+ * ═══════════════════════════════════════════════════════════════════════
+ * USEopenclaw.JS — WebSocket Gateway to AI Agent
+ * ═══════════════════════════════════════════════════════════════════════
  *
- * Manages the WebSocket connection to the OpenClaw gateway.
- * OpenClaw listens on ws://127.0.0.1:18789 (default port after install).
+ * Custom React hook managing WebSocket connection to OpenClaw gateway.
+ * OpenClaw endpoint: ws://127.0.0.1:18789 (auto-reconnects if dropped)
  *
+<<<<<<< HEAD
  * 
  * Message format sent TO OpenClaw:
+=======
+ * OUTBOUND MESSAGE FORMAT (to OpenClaw):
+>>>>>>> b36a71ba706e72497f688977845d27cc5de0e5ad
  *   {
  *     type: 'message',
- *     role: 'junior_dev',           ← used by ArmorClaw for policy checks
- *     content: 'Drop the patient database'
+ *     role: 'junior_dev' | 'senior_dev' | 'project_manager',
+ *     content: 'Drop the patient database'  ← user command
  *   }
  *
+<<<<<<< HEAD
  * 
  * Messages received FROM OpenClaw:
  *   { type: 'armorclaw_block', tool, reason }  ← ArmorClaw blocked the tool call
@@ -23,10 +30,21 @@
  *   role      (string) — current role, re-attached to every outgoing message
  *   onBlock   (fn)     — called with { command, reason } when ArmorClaw blocks
  *   onAllow   (fn)     — called with { command, tool }   when ArmorClaw allows
+=======
+ * INBOUND MESSAGE FORMATS (from OpenClaw):
+ *   { type: 'armorclaw_block', tool, reason }  ← Policy rejected (→ onBlock callback)
+ *   { type: 'armorclaw_allow', tool }          ← Policy approved (→ onAllow callback)
+ *   { type: 'message', content }               ← AI response text
  *
- * Returns:
- *   sendCommand   (fn)   — call with a command string to send to OpenClaw
- *   isConnected   (bool) — WebSocket readyState === OPEN
+ * HOOK OPTIONS:
+ *   role   (string) — Current user role (attached to every outgoing message)
+ *   onBlock (fn)    — Callback: { command, reason } when ArmorClaw blocks
+ *   onAllow (fn)    — Callback: { command, tool } when ArmorClaw allows
+>>>>>>> b36a71ba706e72497f688977845d27cc5de0e5ad
+ *
+ * RETURNS:
+ *   sendCommand(cmd)  → Send string to OpenClaw
+ *   isConnected       → Boolean: WebSocket.OPEN?
  */
 
 import { useState, useEffect, useRef, useCallback } from 'react';
@@ -38,7 +56,7 @@ export default function useOpenClaw({ role, onBlock, onAllow }) {
   const [isConnected, setIsConnected] = useState(false);
   const wsRef = useRef(null);
 
-  // Keep latest role in a ref so the sendCommand closure always reads the current value
+  // Keep role in a ref so the sendCommand closure always reads the current value
   const roleRef = useRef(role);
   useEffect(() => { roleRef.current = role; }, [role]);
 

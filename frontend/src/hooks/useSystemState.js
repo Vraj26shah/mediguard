@@ -1,12 +1,20 @@
 /**
- * useSystemState.js
+ * ═══════════════════════════════════════════════════════════════════════
+ * USESYSTEMSTATE.JS — Backend Status Poller
+ * ═══════════════════════════════════════════════════════════════════════
  *
+<<<<<<< HEAD
  * Custom React hook that polls GET /api/status every few seconds
  * and returns the current service states.
+=======
+ * Custom React hook polling GET /api/status every 2 seconds.
+ * Updates Dashboard with live service state changes.
+>>>>>>> b36a71ba706e72497f688977845d27cc5de0e5ad
  *
- * The Vite proxy in vite.config.js forwards /api → http://localhost:4000
- * so no hardcoded backend URL is needed here.
+ * Vite proxy (vite.config.js) forwards /api → http://localhost:4000
+ * so no hardcoded backend URL is needed.
  *
+<<<<<<< HEAD
  * When the backend is unreachable (ECONNREFUSED / network error) the hook
  * returns sensible fallback data so the UI still renders, and backs off
  * the polling interval to avoid spamming the Vite console.
@@ -15,6 +23,15 @@
  *   services  (object) — { auth_api: {...}, patient_db: {...}, billing_api: {...} }
  *   isLoading (bool)   — true on the first fetch before any data arrives
  *   error     (string | null) — set if the fetch fails
+=======
+ * RETURNS:
+ *   services  → { auth_api, patient_db, billing_api, ... }
+ *   isLoading → true until first data arrives
+ *   error     → error message string (or null)
+ *
+ * USAGE:
+ *   const { services, isLoading, error } = useSystemState();
+>>>>>>> b36a71ba706e72497f688977845d27cc5de0e5ad
  */
 
 import { useState, useEffect, useRef } from 'react';

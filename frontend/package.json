@@ -1,7 +1,7 @@
 {
-  "name": "mediguard-frontend",
+  "name": "Devsec-frontend",
   "version": "1.0.0",
-  "description": "React dashboard for MediGuard — AI-powered SRE assistant",
+  "description": "React dashboard for Devsec — AI-powered SRE assistant",
   "type": "module",
   "scripts": {
     "dev": "vite",
