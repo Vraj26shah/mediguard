@@ -1,21 +1,8 @@
-/**
- * ServiceCard.jsx
- *
- * Displays the live status of a single infrastructure service.
- * Color-coded:
- *   green  → service is 'online'
- *   red    → service is 'offline' (e.g. after a DROP action was ALLOWED)
- *
- * Props:
- *   serviceKey  (string) — e.g. 'patient_db'
- *   service     (object) — { name, status, uptime, lastAction, containsPHI? }
- *
- * Data comes from useSystemState → GET /api/status (polled every 2s).
- */
 
 import React from 'react';
 
 export default function ServiceCard({ serviceKey, service }) {
+  if (!service) return null;
   const isOnline = service.status === 'online';
 
   return (
@@ -26,7 +13,6 @@ export default function ServiceCard({ serviceKey, service }) {
           : 'border-red-800 bg-red-950/30'
       }`}
     >
-      {/* Service name + PHI badge */}
       <div className="flex items-center justify-between mb-2">
         <span className="text-sm font-semibold text-gray-200">{service.name}</span>
         {service.containsPHI && (

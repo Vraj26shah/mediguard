@@ -30,6 +30,54 @@ const ROLE_PERMISSIONS = {
   },
 };
 
+/**
+ * Maps risk level to concrete Tailwind classes.
+ * Dynamic interpolation like `text-${color}-400` gets purged by Tailwind's
+ * JIT compiler — we must use fully-written class strings instead.
+ */
+const RISK_STYLES = {
+  excellent: {
+    label: 'Excellent',
+    icon: '✓',
+    textColor: 'text-emerald-400',
+    badgeBg: 'bg-emerald-500/20',
+    badgeBorder: 'border-emerald-500/40',
+    barGradient: 'bg-gradient-to-r from-emerald-500 to-emerald-600',
+    circleBg: 'bg-emerald-500/20',
+    circleBorder: 'border-emerald-500/50',
+  },
+  good: {
+    label: 'Healthy',
+    icon: '✓',
+    textColor: 'text-green-400',
+    badgeBg: 'bg-green-500/20',
+    badgeBorder: 'border-green-500/40',
+    barGradient: 'bg-gradient-to-r from-green-500 to-green-600',
+    circleBg: 'bg-green-500/20',
+    circleBorder: 'border-green-500/50',
+  },
+  warning: {
+    label: 'Caution',
+    icon: '!',
+    textColor: 'text-amber-400',
+    badgeBg: 'bg-amber-500/20',
+    badgeBorder: 'border-amber-500/40',
+    barGradient: 'bg-gradient-to-r from-amber-500 to-amber-600',
+    circleBg: 'bg-amber-500/20',
+    circleBorder: 'border-amber-500/50',
+  },
+  critical: {
+    label: 'Critical',
+    icon: '✕',
+    textColor: 'text-red-400',
+    badgeBg: 'bg-red-500/20',
+    badgeBorder: 'border-red-500/40',
+    barGradient: 'bg-gradient-to-r from-red-500 to-red-600',
+    circleBg: 'bg-red-500/20',
+    circleBorder: 'border-red-500/50',
+  },
+};
+
 export default function Dashboard({
   role,
   services,
@@ -40,8 +88,8 @@ export default function Dashboard({
 }) {
   const [aiCommand, setAiCommand] = useState('');
   const [stats, setStats] = useState({
-    totalServices: 3,
-    healthyServices: 3,
+    totalServices: 0,
+    healthyServices: 0,
     blockedAttempts: 0,
     allowedActions: 0,
   });
@@ -65,11 +113,34 @@ export default function Dashboard({
 
   const getRiskLevel = (service) => {
     const uptime = service.uptime;
-    if (uptime >= 99.5) return { level: 'excellent', color: 'emerald', label: 'Excellent', icon: '✓' };
-    if (uptime >= 99) return { level: 'good', color: 'green', label: 'Healthy', icon: '✓' };
-    if (uptime >= 98) return { level: 'warning', color: 'amber', label: 'Caution', icon: '!' };
-    return { level: 'critical', color: 'red', label: 'Critical', icon: '✕' };
+    if (uptime >= 99.5) return 'excellent';
+    if (uptime >= 99) return 'good';
+    if (uptime >= 98) return 'warning';
+    return 'critical';
   };
+
+  // Dynamic subtext for the "Online Services" stat card
+  const onlineSubtext =
+    stats.healthyServices === stats.totalServices && stats.totalServices > 0
+      ? 'All systems operational'
+      : stats.healthyServices === 0
+        ? 'All services offline'
+        : `${stats.totalServices - stats.healthyServices} service(s) degraded`;
+
+  // Dynamic color for the "Online Services" stat card
+  const onlineCardClasses =
+    stats.healthyServices === 0
+      ? 'bg-gradient-to-br from-red-900/40 to-red-950/20 border border-red-800/50 hover:border-red-700/80'
+      : stats.healthyServices === stats.totalServices
+        ? 'bg-gradient-to-br from-emerald-900/40 to-emerald-950/20 border border-emerald-800/50 hover:border-emerald-700/80'
+        : 'bg-gradient-to-br from-amber-900/40 to-amber-950/20 border border-amber-800/50 hover:border-amber-700/80';
+
+  const onlineLabelClasses =
+    stats.healthyServices === 0
+      ? 'text-red-400'
+      : stats.healthyServices === stats.totalServices
+        ? 'text-emerald-400'
+        : 'text-amber-400';
 
   return (
     <div className="h-full overflow-y-auto bg-gray-950">
@@ -82,10 +153,10 @@ export default function Dashboard({
             <p className="text-xs text-gray-400">Healthcare Infrastructure</p>
           </div>
 
-          <div className="bg-gradient-to-br from-emerald-900/40 to-emerald-950/20 border border-emerald-800/50 rounded-xl p-6 hover:border-emerald-700/80 transition-all">
-            <p className="text-xs font-bold text-emerald-400 uppercase tracking-wider mb-3">Online Services</p>
+          <div className={`${onlineCardClasses} rounded-xl p-6 transition-all`}>
+            <p className={`text-xs font-bold ${onlineLabelClasses} uppercase tracking-wider mb-3`}>Online Services</p>
             <p className="text-4xl font-black text-white mb-2">{stats.healthyServices}</p>
-            <p className="text-xs text-gray-400">All systems operational</p>
+            <p className="text-xs text-gray-400">{onlineSubtext}</p>
           </div>
 
           <div className="bg-gradient-to-br from-green-900/40 to-green-950/20 border border-green-800/50 rounded-xl p-6 hover:border-green-700/80 transition-all">
@@ -108,7 +179,7 @@ export default function Dashboard({
             {/* Infrastructure Services */}
             <div className="bg-gradient-to-br from-gray-900 to-gray-950 border border-gray-800 rounded-xl p-8">
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-lg font-black text-white uppercase tracking-tight">Infrastructure Health</h2>
+                <h2 className="text-lg font-black text-white tracking-tight">Infrastructure Health</h2>
                 <span className="text-xs font-bold text-gray-500">Real-time Status</span>
               </div>
 
@@ -117,7 +188,8 @@ export default function Dashboard({
                   <p className="text-sm text-gray-500 py-8 text-center">Loading services...</p>
                 ) : (
                   Object.entries(services).map(([key, service]) => {
-                    const risk = getRiskLevel(service);
+                    const riskLevel = getRiskLevel(service);
+                    const risk = RISK_STYLES[riskLevel];
                     return (
                       <div
                         key={key}
@@ -127,26 +199,26 @@ export default function Dashboard({
                           <div className="flex-1">
                             <h3 className="text-base font-bold text-white mb-1">{service.name}</h3>
                             <p className="text-xs text-gray-400">
-                              Status: <span className={`text-${risk.color}-400 font-semibold`}>{service.status.toUpperCase()}</span>
+                              Status: <span className={`${risk.textColor} font-semibold`}>{service.status.toUpperCase()}</span>
                             </p>
                           </div>
-                          <div className={`px-3 py-1.5 rounded-lg bg-${risk.color}-500/20 border border-${risk.color}-500/40`}>
-                            <span className={`text-sm font-bold text-${risk.color}-400`}>{risk.label}</span>
+                          <div className={`px-3 py-1.5 rounded-lg ${risk.badgeBg} border ${risk.badgeBorder}`}>
+                            <span className={`text-sm font-bold ${risk.textColor}`}>{risk.label}</span>
                           </div>
                         </div>
 
                         <div className="flex items-center justify-between">
                           <div className="flex-1">
-                            <div className="bg-gray-700 h-2 rounded-full overflow-hidden">
+                            <div className="bg-gray-700 h-2.5 rounded-full overflow-hidden">
                               <div
-                                className={`h-full bg-gradient-to-r from-${risk.color}-500 to-${risk.color}-600 rounded-full`}
+                                className={`h-full ${risk.barGradient} rounded-full transition-all duration-700`}
                                 style={{ width: `${service.uptime}%` }}
                               />
                             </div>
                             <p className="text-xs text-gray-500 mt-2">Uptime: <span className="font-mono text-gray-400">{service.uptime}%</span></p>
                           </div>
-                          <div className={`ml-4 w-10 h-10 rounded-full bg-${risk.color}-500/20 border-2 border-${risk.color}-500/50 flex items-center justify-center`}>
-                            <span className={`text-${risk.color}-400 font-bold`}>{risk.icon}</span>
+                          <div className={`ml-4 w-10 h-10 rounded-full ${risk.circleBg} border-2 ${risk.circleBorder} flex items-center justify-center`}>
+                            <span className={`${risk.textColor} font-bold`}>{risk.icon}</span>
                           </div>
                         </div>
                       </div>
@@ -158,7 +230,7 @@ export default function Dashboard({
 
             {/* Access Control Matrix */}
             <div className="bg-gradient-to-br from-gray-900 to-gray-950 border border-gray-800 rounded-xl p-8">
-              <h2 className="text-lg font-black text-white uppercase tracking-tight mb-6">Access Control</h2>
+              <h2 className="text-lg font-black text-white tracking-tight mb-6">Access Control</h2>
               <div className="space-y-3">
                 {ROLE_PERMISSIONS[role].permissions.map((perm, idx) => (
                   <div key={idx} className="flex items-center justify-between p-4 bg-gray-800/50 rounded-lg border border-gray-700/50 hover:border-gray-600/80 transition-all">
@@ -190,19 +262,19 @@ export default function Dashboard({
           <div className="space-y-8">
             {/* AI Command Interface */}
             <div className="bg-gradient-to-br from-gray-900 to-gray-950 border border-gray-800 rounded-xl p-8 flex flex-col h-96">
-              <h2 className="text-lg font-black text-white uppercase tracking-tight mb-4">AI Commands</h2>
+              <h2 className="text-lg font-black text-white tracking-tight mb-4">AI Commands</h2>
               <form onSubmit={handleSendCommand} className="flex-1 flex flex-col">
                 <textarea
                   value={aiCommand}
                   onChange={(e) => setAiCommand(e.target.value)}
                   placeholder="Type natural language command..."
                   disabled={!isConnected}
-                  className="flex-1 bg-gray-800 text-gray-200 text-sm font-mono border border-gray-700 rounded-lg p-4 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 mb-4 resize-none disabled:opacity-50 placeholder-gray-600"
+                  className="flex-1 bg-gray-800 text-gray-200 text-sm font-mono border border-gray-700 rounded-lg p-4 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 mb-4 resize-none disabled:opacity-50 placeholder-gray-500"
                 />
                 <button
                   type="submit"
                   disabled={!isConnected || !aiCommand.trim()}
-                  className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 disabled:from-gray-700 disabled:to-gray-700 disabled:opacity-50 text-white font-bold py-3 rounded-lg transition-all shadow-lg shadow-blue-600/30 uppercase text-sm tracking-wider"
+                  className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 disabled:from-gray-700 disabled:to-gray-700 disabled:opacity-50 text-white font-bold py-3 rounded-lg transition-all shadow-lg shadow-blue-600/30 text-sm tracking-wider"
                 >
                   Execute Command
                 </button>
@@ -211,7 +283,7 @@ export default function Dashboard({
 
             {/* ArmorClaw Policy */}
             <div className="bg-gradient-to-br from-gray-900 to-gray-950 border border-gray-800 rounded-xl p-8">
-              <h2 className="text-lg font-black text-white uppercase tracking-tight mb-6">ArmorClaw Policy</h2>
+              <h2 className="text-lg font-black text-white tracking-tight mb-6">ArmorClaw Policy</h2>
               <div className="space-y-4">
                 <div className="p-4 bg-purple-500/10 border border-purple-500/30 rounded-lg">
                   <p className="text-xs text-purple-300 font-bold uppercase tracking-wider mb-2">Default Action</p>
@@ -238,13 +310,16 @@ export default function Dashboard({
         {/* AUDIT LOG */}
         <div className="bg-gradient-to-br from-gray-900 to-gray-950 border border-gray-800 rounded-xl p-8">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-lg font-black text-white uppercase tracking-tight">Prompt Audit Trail</h2>
+            <h2 className="text-lg font-black text-white tracking-tight">Prompt Audit Trail</h2>
             <span className="text-xs font-bold text-gray-500">{auditEntries.length} Events</span>
           </div>
 
           <div className="space-y-3 max-h-96 overflow-y-auto pr-4">
             {auditEntries.length === 0 ? (
               <div className="text-center py-12">
+                <svg className="w-12 h-12 mx-auto text-gray-700 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15a2.25 2.25 0 012.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25zM6.75 12h.008v.008H6.75V12zm0 3h.008v.008H6.75V15zm0 3h.008v.008H6.75V18z" />
+                </svg>
                 <p className="text-gray-500 font-semibold mb-2">No prompts executed yet</p>
                 <p className="text-xs text-gray-600">Execute a command to see the audit trail</p>
               </div>

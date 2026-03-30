@@ -1,11 +1,15 @@
 /**
  * useSystemState.js
  *
- * Custom React hook that polls GET /api/status every 2 seconds
+ * Custom React hook that polls GET /api/status every few seconds
  * and returns the current service states.
  *
  * The Vite proxy in vite.config.js forwards /api → http://localhost:4000
  * so no hardcoded backend URL is needed here.
+ *
+ * When the backend is unreachable (ECONNREFUSED / network error) the hook
+ * returns sensible fallback data so the UI still renders, and backs off
+ * the polling interval to avoid spamming the Vite console.
  *
  * Returns:
  *   services  (object) — { auth_api: {...}, patient_db: {...}, billing_api: {...} }
@@ -13,17 +17,45 @@
  *   error     (string | null) — set if the fetch fails
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 const POLL_INTERVAL_MS = 2000;
+const BACKOFF_INTERVAL_MS = 10000; // poll less often when backend is down
+
+/** Mock services so the UI can still render while the backend is offline */
+const FALLBACK_SERVICES = {
+  auth_api: {
+    name: 'Auth API',
+    status: 'offline',
+    uptime: 0,
+    containsPHI: false,
+    lastAction: null,
+  },
+  patient_db: {
+    name: 'Patient DB',
+    status: 'offline',
+    uptime: 0,
+    containsPHI: true,
+    lastAction: null,
+  },
+  billing_api: {
+    name: 'Billing API',
+    status: 'offline',
+    uptime: 0,
+    containsPHI: false,
+    lastAction: null,
+  },
+};
 
 export default function useSystemState() {
-  const [services, setServices] = useState({});
+  const [services, setServices] = useState(FALLBACK_SERVICES);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const backendDown = useRef(false);
 
   useEffect(() => {
     let isMounted = true;
+    let timerId = null;
 
     async function fetchStatus() {
       try {
@@ -35,22 +67,35 @@ export default function useSystemState() {
           setServices(data.services);
           setIsLoading(false);
           setError(null);
+          backendDown.current = false;
         }
       } catch (err) {
         if (isMounted) {
-          setError(err.message);
+          // On first failure, populate fallback so the UI isn't empty
+          if (backendDown.current === false) {
+            setServices((prev) =>
+              Object.keys(prev).length === 0 ? FALLBACK_SERVICES : prev
+            );
+          }
+          backendDown.current = true;
+          setError('Backend unavailable – running in offline mode');
           setIsLoading(false);
         }
       }
+
+      // Schedule next poll — use a longer interval when the backend is down
+      if (isMounted) {
+        const delay = backendDown.current ? BACKOFF_INTERVAL_MS : POLL_INTERVAL_MS;
+        timerId = setTimeout(fetchStatus, delay);
+      }
     }
 
-    // Fetch immediately, then start polling
+    // Kick off the first fetch
     fetchStatus();
-    const interval = setInterval(fetchStatus, POLL_INTERVAL_MS);
 
     return () => {
       isMounted = false;
-      clearInterval(interval);
+      if (timerId) clearTimeout(timerId);
     };
   }, []);
 

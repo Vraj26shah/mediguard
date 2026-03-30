@@ -4,6 +4,7 @@
  * Manages the WebSocket connection to the OpenClaw gateway.
  * OpenClaw listens on ws://127.0.0.1:18789 (default port after install).
  *
+ * 
  * Message format sent TO OpenClaw:
  *   {
  *     type: 'message',
@@ -11,11 +12,13 @@
  *     content: 'Drop the patient database'
  *   }
  *
+ * 
  * Messages received FROM OpenClaw:
  *   { type: 'armorclaw_block', tool, reason }  ← ArmorClaw blocked the tool call
  *   { type: 'armorclaw_allow', tool }           ← ArmorClaw allowed the tool call
  *   { type: 'message', content }                ← AI text response
  *
+ * 
  * Props (options object):
  *   role      (string) — current role, re-attached to every outgoing message
  *   onBlock   (fn)     — called with { command, reason } when ArmorClaw blocks

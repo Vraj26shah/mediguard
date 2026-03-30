@@ -115,7 +115,7 @@ export default function ChatPanel({ role, onRoleChange, onSend }) {
           value={input}
           onChange={(e) => setInput(e.target.value)}
           placeholder='e.g. "Restart the auth service" or "Drop the patient database"'
-          className="flex-1 bg-gray-800 text-gray-200 text-sm rounded px-3 py-2 border border-gray-700 focus:outline-none focus:border-blue-500 placeholder-gray-600"
+          className="flex-1 bg-gray-800 text-gray-200 text-sm rounded px-3 py-2 border border-gray-700 focus:outline-none focus:border-blue-500 placeholder-gray-500"
         />
         <button
           type="submit"

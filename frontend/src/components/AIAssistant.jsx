@@ -99,7 +99,7 @@ export default function AIAssistant({ role, onSend, isConnected, activeFile }) {
           onChange={(e) => setInput(e.target.value)}
           placeholder={isConnected ? 'Ask AI...' : 'Connecting...'}
           disabled={!isConnected}
-          className="flex-1 bg-gray-800 text-gray-200 text-xs px-2 py-1 rounded border border-gray-700 focus:border-blue-500 focus:outline-none font-mono placeholder-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="flex-1 bg-gray-800 text-gray-200 text-xs px-2 py-1 rounded border border-gray-700 focus:border-blue-500 focus:outline-none font-mono placeholder-gray-500 disabled:opacity-50 disabled:cursor-not-allowed"
         />
         <button
           type="submit"

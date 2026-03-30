@@ -23,5 +23,9 @@ app.delete('/api/auth/revoke-all', async (req, res) => {
     } catch (e) { res.status(500).json({ success: false, message: e.message }); }
 });
 
+app.get('/',(req,res)=>{
+    res.json({"status":"working of backend of port:3001"});
+})
+
 const port = process.env.AUTH_PORT || 3001;
 app.listen(port, () => console.log(`Auth Service operating over Prisma on :${port}`));
